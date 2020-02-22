@@ -1,0 +1,20 @@
+# system info cordic_atan2_v1 on 2020.02.16.18:11:34
+system_info:
+name,value
+DEVICE,5CGXFC7C7F23C8
+DEVICE_FAMILY,Cyclone V
+GENERATION_ID,1581894682
+#
+#
+# Files generated for cordic_atan2_v1 on 2020.02.16.18:11:34
+files:
+filepath,kind,attributes,module,is_top
+simulation/cordic_atan2_v1.vhd,VHDL,,cordic_atan2_v1,true
+simulation/submodules/dspba_library_package.vhd,VHDL,,cordic_atan2_v1_CORDIC_0,false
+simulation/submodules/dspba_library.vhd,VHDL,,cordic_atan2_v1_CORDIC_0,false
+simulation/submodules/cordic_atan2_v1_CORDIC_0.vhd,VHDL,,cordic_atan2_v1_CORDIC_0,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+cordic_atan2_v1.CORDIC_0,cordic_atan2_v1_CORDIC_0
