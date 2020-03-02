@@ -38,7 +38,11 @@ ENTITY fft_atan2_v1 IS
 		source_real :  OUT  STD_LOGIC_VECTOR(15 DOWNTO 0);
 
 		--my additions
-		sink_ready : OUT STD_LOGIC
+		sink_ready : OUT STD_LOGIC;
+		mag :  OUT  STD_LOGIC_VECTOR(14 DOWNTO 0);
+		source_valid : OUT  STD_LOGIC_VECTOR(0 DOWNTO 0);
+		mag2 : OUT  STD_LOGIC_VECTOR(15 DOWNTO 0)
+		
 	);
 END fft_atan2_v1;
 
@@ -67,15 +71,72 @@ COMPONENT fft_burst_16x1024_v1
 	);
 END COMPONENT;
 
-COMPONENT cordic_atan2_v1
-	PORT(areset : IN STD_LOGIC;
-		 clk : IN STD_LOGIC;
-		 en : IN STD_LOGIC;
-		 x : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-		 y : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-		 q : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+--COMPONENT cordic_atan2_v1
+--	PORT(areset : IN STD_LOGIC;
+--		 clk : IN STD_LOGIC;
+--		 en : IN STD_LOGIC;
+--		 x : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+--		 y : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+--		 q : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+--	);
+--END COMPONENT;
+
+--component cordic_atan2_v2 is
+--		port (
+--			clk    : in  std_logic                     := 'X';             -- clk
+--			areset : in  std_logic                     := 'X';             -- reset
+--			x      : in  std_logic_vector(15 downto 0) := (others => 'X'); -- x
+--			y      : in  std_logic_vector(15 downto 0) := (others => 'X'); -- y
+--			q      : out std_logic_vector(15 downto 0);                    -- q
+--			r      : out std_logic_vector(15 downto 0);                    -- r
+--			en     : in  std_logic_vector(0 downto 0)  := (others => 'X')  -- en
+--		);
+--	end component cordic_atan2_v2;
+	
+	component cordic_atan2_v2 is
+		port (
+			areset : in  std_logic                     := 'X';             -- reset
+			clk    : in  std_logic                     := 'X';             -- clk
+			en     : in  std_logic_vector(0 downto 0)  := (others => 'X'); -- en
+			--Angle is q.
+			q      : out std_logic_vector(15 downto 0);                    -- q
+			--Magnitude is r
+			r      : out std_logic_vector(14 downto 0);                    -- r
+			x      : in  std_logic_vector(15 downto 0) := (others => 'X'); -- x
+			y      : in  std_logic_vector(15 downto 0) := (others => 'X')  -- y
+		);
+	end component cordic_atan2_v2;
+	
+component square16bits_v1
+	PORT
+	(
+		clock		: IN STD_LOGIC ;
+		dataa		: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+		result		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
 	);
-END COMPONENT;
+end component;
+
+component adder32bits_signed
+	PORT
+	(
+		clock		: IN STD_LOGIC ;
+		dataa		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+		datab		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+		result		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+	);
+end component;
+
+component squareroot32bits_v1
+	PORT
+	(
+		clk		: IN STD_LOGIC ;
+		radical		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+		q		: OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+		remainder		: OUT STD_LOGIC_VECTOR (16 DOWNTO 0)
+	);
+end component;
+
+	
 
 SIGNAL	RESETn :  STD_LOGIC;
 SIGNAL	source_imag_ALTERA_SYNTHESIZED :  STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -84,8 +145,17 @@ SIGNAL	source_real_ALTERA_SYNTHESIZED :  STD_LOGIC_VECTOR(15 DOWNTO 0);
 SIGNAL	SYNTHESIZED_WIRE_0 :  STD_LOGIC_VECTOR(0 DOWNTO 0);
 SIGNAL	SYNTHESIZED_WIRE_1 :  STD_LOGIC;
 SIGNAL	SYNTHESIZED_WIRE_2 :  STD_LOGIC_VECTOR(0 TO 1);
-SIGNAL	SYNTHESIZED_WIRE_3 :  STD_LOGIC_VECTOR(0 TO 15);
-SIGNAL	SYNTHESIZED_WIRE_4 :  STD_LOGIC;
+SIGNAL	SYNTHESIZED_WIRE_3 :  STD_LOGIC_VECTOR(15 DOWNTO 0);
+SIGNAL	SYNTHESIZED_WIRE_4 :  STD_LOGIC_VECTOR(0 DOWNTO 0);
+SIGNAL	VCC	:	STD_LOGIC;
+
+SIGNAL	real_sq	: STD_LOGIC_VECTOR(31 DOWNTO 0);
+SIGNAL	imag_sq	: STD_LOGIC_VECTOR(31 DOWNTO 0);
+SIGNAL	w1 : STD_LOGIC;
+SIGNAL	dff1 : STD_LOGIC;
+SIGNAL	r1	: STD_LOGIC_VECTOR(31 DOWNTO 0);
+SIGNAL 	remain1	:  STD_LOGIC_VECTOR(16 DOWNTO 0);
+
 
 
 BEGIN 
@@ -94,7 +164,7 @@ SYNTHESIZED_WIRE_0 <= "0";
 SYNTHESIZED_WIRE_1 <= '1';
 SYNTHESIZED_WIRE_2 <= "00";
 SYNTHESIZED_WIRE_3 <= "0000000000000000";
-
+VCC <= '1';
 
 
 --b2v_inst : fft_burst_16x1024_v1
@@ -109,26 +179,90 @@ PORT MAP(clk => CLK,
 		 sink_error => SYNTHESIZED_WIRE_2,
 		 sink_imag => SYNTHESIZED_WIRE_3,
 		 sink_real => real,
-		 source_valid => SYNTHESIZED_WIRE_4,
+		 source_valid => SYNTHESIZED_WIRE_4(0),
 		 source_imag => source_imag_ALTERA_SYNTHESIZED,
 		 source_real => source_real_ALTERA_SYNTHESIZED,
-		 sink_ready => sink_ready);
+		 sink_ready => sink_ready);	
 
 
-c <= a AND b;
+--dff1 data flipflop
+process (CLK, RESETn)
+begin
+	-- Reset whenever the reset signal goes low, regardless of the clock
+	-- or the clock enable
+	if (RESETn = '0') then
+		dff1 <= '0';
+	elsif (rising_edge(CLK)) then
+			dff1 <= w1;
+	end if;
+end process;
+
+w1 <= a AND b;
+c <= dff1;
 
 
-b2v_inst2 : cordic_atan2_v1
-PORT MAP(areset => RESET,
-		 clk => CLK,
-		 en => SYNTHESIZED_WIRE_4,
-		 x => source_real_ALTERA_SYNTHESIZED,
-		 y => source_imag_ALTERA_SYNTHESIZED,
-		 q => rad);
+--b2v_inst2 : cordic_atan2_v1
+--PORT MAP(areset => RESET,
+--		 clk => CLK,
+--		 en => SYNTHESIZED_WIRE_4(0),
+--		 x => source_real_ALTERA_SYNTHESIZED,
+--		 y => source_imag_ALTERA_SYNTHESIZED,
+--		 q => rad);
+
+	u0 : component cordic_atan2_v2
+		port map (
+			clk    => CLK,    --    clk.clk
+			areset => RESET, -- areset.reset
+			x      => source_real_ALTERA_SYNTHESIZED,      --      x.x
+			y      => source_imag_ALTERA_SYNTHESIZED,      --      y.y
+			q      => rad,      --      q.q
+			r      => mag,      --      r.r
+			en(0)     => VCC      --     en.en
+		);
+		
+	u1_REAL : component square16bits_v1
+		port map (
+			clock	=> CLK,
+			dataa => source_real_ALTERA_SYNTHESIZED,		
+			result => real_sq
+		);
+		
+	u2_IMAG : component square16bits_v1
+		port map (
+			clock	=> CLK,
+			dataa => source_imag_ALTERA_SYNTHESIZED,		
+			result => imag_sq
+		);
+		
+	u3: component adder32bits_signed 
+	port map
+	(
+		clock => CLK,
+		dataa	=> real_sq,
+		datab	=> imag_sq,
+		result => r1
+	);
+	
+	u4 : component squareroot32bits_v1
+	port map
+	(
+		clk		=> CLK,
+		radical	=> r1,
+		q		=> mag2,
+		remainder => remain1
+	);
+
+	
+	
 
 
+
+
+		
+		
 
 RESETn <= NOT(RESET);
+source_valid(0) <= SYNTHESIZED_WIRE_4(0);
 
 
 

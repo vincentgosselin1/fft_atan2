@@ -45,6 +45,9 @@ SIGNAL source_imag : STD_LOGIC_VECTOR(15 DOWNTO 0);
 SIGNAL source_real : STD_LOGIC_VECTOR(15 DOWNTO 0);
 SIGNAL valid : STD_LOGIC;
 SIGNAL sink_ready : STD_LOGIC;
+SIGNAL mag : STD_LOGIC_VECTOR(14 DOWNTO 0);
+SIGNAL source_valid : STD_LOGIC_VECTOR(0 DOWNTO 0);
+SIGNAL mag2 : STD_LOGIC_VECTOR(15 DOWNTO 0);
 
 COMPONENT fft_atan2_v1
 	PORT (
@@ -60,7 +63,10 @@ COMPONENT fft_atan2_v1
 	source_imag : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 	source_real : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 	valid : IN STD_LOGIC;
-	sink_ready : OUT STD_LOGIC
+	sink_ready : OUT STD_LOGIC;
+	mag : OUT STD_LOGIC_VECTOR(14 DOWNTO 0);
+	source_valid : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+	mag2 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 	);
 END COMPONENT;
 BEGIN
@@ -79,7 +85,10 @@ BEGIN
 	source_imag => source_imag,
 	source_real => source_real,
 	valid => valid,
-	sink_ready => sink_ready
+	sink_ready => sink_ready,
+	mag => mag,
+	source_valid(0) => source_valid(0),
+	mag2 => mag2
 	);
 init : PROCESS                                               
 -- variable declarations                                     
@@ -122,6 +131,8 @@ BEGIN
 	eop <= '0'; 
 	valid <= '0'; 
 	wait for 20 ns;
+
+	a <= '1';
 
 	--valid <= '1'; 
 	--wait for 5 ns;
