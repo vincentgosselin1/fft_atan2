@@ -31,7 +31,7 @@ ENTITY fft_atan2_v1 IS
 		eop :  IN  STD_LOGIC;
 		a :  IN  STD_LOGIC;
 		b :  IN  STD_LOGIC;
-		real :  IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+		--real :  IN  STD_LOGIC_VECTOR(15 DOWNTO 0); -- now in the ROM
 		c :  OUT  STD_LOGIC;
 		rad :  OUT  STD_LOGIC_VECTOR(15 DOWNTO 0);
 		source_imag :  OUT  STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -41,7 +41,8 @@ ENTITY fft_atan2_v1 IS
 		sink_ready : OUT STD_LOGIC;
 		mag :  OUT  STD_LOGIC_VECTOR(14 DOWNTO 0);
 		source_valid : OUT  STD_LOGIC_VECTOR(0 DOWNTO 0);
-		mag2 : OUT  STD_LOGIC_VECTOR(15 DOWNTO 0)
+		mag2 : OUT  STD_LOGIC_VECTOR(15 DOWNTO 0);
+		TRIGGER : IN STD_LOGIC--TO START READING ROM.
 		
 	);
 END fft_atan2_v1;
@@ -136,6 +137,28 @@ component squareroot32bits_v1
 	);
 end component;
 
+component ROM_RAWDATA
+	PORT
+	(
+		address		: IN STD_LOGIC_VECTOR (9 DOWNTO 0);
+		clock		: IN STD_LOGIC  := '1';
+		rden		: IN STD_LOGIC  := '1';
+		q		: OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+	);
+end component;
+
+COMPONENT ROM_READER_V1
+	PORT
+	(
+		TRIGGER_IN		:	 IN STD_LOGIC;
+		CLK		:	 IN STD_LOGIC;
+		RESET		:	 IN STD_LOGIC;
+		READ_ENA		:	 OUT STD_LOGIC;
+		ROM_ADDR		:	 OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
+	);
+END COMPONENT;
+
+
 	
 
 SIGNAL	RESETn :  STD_LOGIC;
@@ -155,6 +178,13 @@ SIGNAL	w1 : STD_LOGIC;
 SIGNAL	dff1 : STD_LOGIC;
 SIGNAL	r1	: STD_LOGIC_VECTOR(31 DOWNTO 0);
 SIGNAL 	remain1	:  STD_LOGIC_VECTOR(16 DOWNTO 0);
+SIGNAL	addr : STD_LOGIC_VECTOR (9 DOWNTO 0);
+SIGNAL	W3 : STD_LOGIC;
+SIGNAL	W4 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+SIGNAL 	cd1 : STD_LOGIC;
+SIGNAL	W5 : STD_LOGIC;
+SIGNAL	W6 : STD_LOGIC;
+
 
 
 
@@ -178,7 +208,7 @@ PORT MAP(clk => CLK,
 		 source_ready => SYNTHESIZED_WIRE_1,
 		 sink_error => SYNTHESIZED_WIRE_2,
 		 sink_imag => SYNTHESIZED_WIRE_3,
-		 sink_real => real,
+		 sink_real => W4,
 		 source_valid => SYNTHESIZED_WIRE_4(0),
 		 source_imag => source_imag_ALTERA_SYNTHESIZED,
 		 source_real => source_real_ALTERA_SYNTHESIZED,
@@ -252,9 +282,29 @@ c <= dff1;
 		remainder => remain1
 	);
 
+	u6 : component ROM_RAWDATA 
+	PORT MAP 
+	(
+		address	 => addr, --output of the counter
+		clock	 => CLK,
+		rden	 => W6, --activated by count_ena
+		q	 => W4
+	);
+	
+	u7 : component ROM_READER_V1
+	PORT MAP
+	(
+		TRIGGER_IN		=> TRIGGER,
+		CLK				=> CLK,
+		RESET				=> RESET,
+		READ_ENA			=> W6,
+		ROM_ADDR			=> addr
+	);
 	
 	
-
+	
+	
+		
 
 
 

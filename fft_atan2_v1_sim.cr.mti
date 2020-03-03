@@ -403,6 +403,14 @@ Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  
 -- Compiling entity asj_fft_lpp_serial
 -- Compiling architecture lp of asj_fft_lpp_serial
 
+} {} {}} C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/COUNTER_10BITS/COUNTER_10BITS.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/COUNTER_10BITS/COUNTER_10BITS.vhd
+Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity COUNTER_10BITS
+-- Compiling architecture SYN of counter_10bits
+
 } {} {}} C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/FFT_Burst_16x1024_v1/simulation/submodules/mentor/altera_fft_dual_port_ram.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/FFT_Burst_16x1024_v1/simulation/submodules/mentor/altera_fft_dual_port_ram.vhd
 Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
 -- Loading package STANDARD
@@ -490,6 +498,15 @@ Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  
 -- Loading package fft_pack
 -- Compiling entity asj_fft_burst_ctrl_qe
 -- Compiling architecture cnt_sw of asj_fft_burst_ctrl_qe
+
+} {} {}} C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/ROM_RAWDATA/ROM_RAWDATA.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/ROM_RAWDATA/ROM_RAWDATA.vhd
+Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package altera_mf_components
+-- Compiling entity ROM_RAWDATA
+-- Compiling architecture SYN of rom_rawdata
 
 } {} {}} C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/FFT_Burst_16x1024_v1/simulation/submodules/mentor/fft_pack.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/FFT_Burst_16x1024_v1/simulation/submodules/mentor/fft_pack.vhd
 Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
@@ -603,6 +620,18 @@ Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  
 -- Loading package fft_pack
 -- Compiling entity asj_fft_cxb_data_r
 -- Compiling architecture syn of asj_fft_cxb_data_r
+
+} {} {}} C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/ROM_READER_V1.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/ROM_READER_V1.vhd
+Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package VITAL_Timing
+-- Loading package VITAL_Primitives
+-- Loading package dffeas_pack
+-- Loading package altera_primitives_components
+-- Compiling entity ROM_READER_V1
+-- Compiling architecture bdf_type of ROM_READER_V1
 
 } {} {}} C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/FFT_Burst_16x1024_v1/simulation/submodules/mentor/asj_fft_si_de_so_bb.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/FFT_Burst_16x1024_v1/simulation/submodules/mentor/asj_fft_si_de_so_bb.vhd
 Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
@@ -1059,6 +1088,15 @@ Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  
 -- Compiling entity asj_fft_dpi_mram
 -- Compiling architecture syn of asj_fft_dpi_mram
 
+} {} {}} C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/binarycounter10bits.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/binarycounter10bits.vhd
+Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity binarycounter10bits
+-- Compiling architecture rtl of binarycounter10bits
+
 } {} {}} C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/FFT_Burst_16x1024_v1/simulation/submodules/mentor/asj_fft_tdl_bit_rst.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/FFT_Burst_16x1024_v1/simulation/submodules/mentor/asj_fft_tdl_bit_rst.vhd
 Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
 -- Loading package STANDARD
@@ -1083,13 +1121,5 @@ Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  
 -- Loading package auk_dspip_lib_pkg
 -- Compiling entity asj_fft_sglstream
 -- Compiling architecture transform of asj_fft_sglstream
-
-} {} {}} C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/fft_atan2_v1.vht {1 {vcom -work work -2002 -explicit -stats=none C:/intelFPGA_lite/17.1/quartus/MyDev/fft_atan2_v1_sim/work/fft_atan2_v1.vht
-Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
--- Loading package STANDARD
--- Loading package TEXTIO
--- Loading package std_logic_1164
--- Compiling entity fft_atan2_v1_vhd_tst
--- Compiling architecture fft_atan2_v1_arch of fft_atan2_v1_vhd_tst
 
 } {} {}}

@@ -31,7 +31,7 @@ ENTITY fft_atan2_v1 IS
 		eop :  IN  STD_LOGIC;
 		a :  IN  STD_LOGIC;
 		b :  IN  STD_LOGIC;
-		real :  IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+		--real :  IN  STD_LOGIC_VECTOR(15 DOWNTO 0); -- now in the ROM
 		c :  OUT  STD_LOGIC;
 		rad :  OUT  STD_LOGIC_VECTOR(15 DOWNTO 0);
 		source_imag :  OUT  STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -39,9 +39,10 @@ ENTITY fft_atan2_v1 IS
 
 		--my additions
 		sink_ready : OUT STD_LOGIC;
-		mag :  OUT  STD_LOGIC_VECTOR(15 DOWNTO 0);
+		mag :  OUT  STD_LOGIC_VECTOR(14 DOWNTO 0);
 		source_valid : OUT  STD_LOGIC_VECTOR(0 DOWNTO 0);
-		mag2 : OUT  STD_LOGIC_VECTOR(15 DOWNTO 0)
+		mag2 : OUT  STD_LOGIC_VECTOR(15 DOWNTO 0);
+		TRIGGER : IN STD_LOGIC--TO START READING ROM.
 		
 	);
 END fft_atan2_v1;
@@ -81,15 +82,29 @@ END COMPONENT;
 --	);
 --END COMPONENT;
 
-component cordic_atan2_v2 is
+--component cordic_atan2_v2 is
+--		port (
+--			clk    : in  std_logic                     := 'X';             -- clk
+--			areset : in  std_logic                     := 'X';             -- reset
+--			x      : in  std_logic_vector(15 downto 0) := (others => 'X'); -- x
+--			y      : in  std_logic_vector(15 downto 0) := (others => 'X'); -- y
+--			q      : out std_logic_vector(15 downto 0);                    -- q
+--			r      : out std_logic_vector(15 downto 0);                    -- r
+--			en     : in  std_logic_vector(0 downto 0)  := (others => 'X')  -- en
+--		);
+--	end component cordic_atan2_v2;
+	
+	component cordic_atan2_v2 is
 		port (
-			clk    : in  std_logic                     := 'X';             -- clk
 			areset : in  std_logic                     := 'X';             -- reset
-			x      : in  std_logic_vector(15 downto 0) := (others => 'X'); -- x
-			y      : in  std_logic_vector(15 downto 0) := (others => 'X'); -- y
+			clk    : in  std_logic                     := 'X';             -- clk
+			en     : in  std_logic_vector(0 downto 0)  := (others => 'X'); -- en
+			--Angle is q.
 			q      : out std_logic_vector(15 downto 0);                    -- q
-			r      : out std_logic_vector(15 downto 0);                    -- r
-			en     : in  std_logic_vector(0 downto 0)  := (others => 'X')  -- en
+			--Magnitude is r
+			r      : out std_logic_vector(14 downto 0);                    -- r
+			x      : in  std_logic_vector(15 downto 0) := (others => 'X'); -- x
+			y      : in  std_logic_vector(15 downto 0) := (others => 'X')  -- y
 		);
 	end component cordic_atan2_v2;
 	
@@ -122,6 +137,28 @@ component squareroot32bits_v1
 	);
 end component;
 
+component ROM_RAWDATA
+	PORT
+	(
+		address		: IN STD_LOGIC_VECTOR (9 DOWNTO 0);
+		clock		: IN STD_LOGIC  := '1';
+		rden		: IN STD_LOGIC  := '1';
+		q		: OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+	);
+end component;
+
+COMPONENT ROM_READER_V1
+	PORT
+	(
+		TRIGGER_IN		:	 IN STD_LOGIC;
+		CLK		:	 IN STD_LOGIC;
+		RESET		:	 IN STD_LOGIC;
+		READ_ENA		:	 OUT STD_LOGIC;
+		ROM_ADDR		:	 OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
+	);
+END COMPONENT;
+
+
 	
 
 SIGNAL	RESETn :  STD_LOGIC;
@@ -141,6 +178,14 @@ SIGNAL	w1 : STD_LOGIC;
 SIGNAL	dff1 : STD_LOGIC;
 SIGNAL	r1	: STD_LOGIC_VECTOR(31 DOWNTO 0);
 SIGNAL 	remain1	:  STD_LOGIC_VECTOR(16 DOWNTO 0);
+SIGNAL	addr : STD_LOGIC_VECTOR (9 DOWNTO 0);
+SIGNAL	addr_i : integer;
+SIGNAL	W3 : STD_LOGIC;
+SIGNAL	W4 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+SIGNAL 	cd1 : STD_LOGIC;
+SIGNAL	W5 : STD_LOGIC;
+SIGNAL	W6 : STD_LOGIC;
+
 
 
 
@@ -164,7 +209,7 @@ PORT MAP(clk => CLK,
 		 source_ready => SYNTHESIZED_WIRE_1,
 		 sink_error => SYNTHESIZED_WIRE_2,
 		 sink_imag => SYNTHESIZED_WIRE_3,
-		 sink_real => real,
+		 sink_real => W4,
 		 source_valid => SYNTHESIZED_WIRE_4(0),
 		 source_imag => source_imag_ALTERA_SYNTHESIZED,
 		 source_real => source_real_ALTERA_SYNTHESIZED,
@@ -201,8 +246,8 @@ c <= dff1;
 			areset => RESET, -- areset.reset
 			x      => source_real_ALTERA_SYNTHESIZED,      --      x.x
 			y      => source_imag_ALTERA_SYNTHESIZED,      --      y.y
-			q      => mag,      --      q.q
-			r      => rad,      --      r.r
+			q      => rad,      --      q.q
+			r      => mag,      --      r.r
 			en(0)     => VCC      --     en.en
 		);
 		
@@ -238,9 +283,29 @@ c <= dff1;
 		remainder => remain1
 	);
 
+	u6 : component ROM_RAWDATA 
+	PORT MAP 
+	(
+		address	 => addr, --output of the counter
+		clock	 => CLK,
+		rden	 => W6, --activated by count_ena
+		q	 => W4
+	);
+	
+	u7 : component ROM_READER_V1
+	PORT MAP
+	(
+		TRIGGER_IN		=> TRIGGER,
+		CLK				=> CLK,
+		RESET				=> RESET,
+		READ_ENA			=> W6,
+		ROM_ADDR			=> addr
+	);
 	
 	
-
+	
+	
+		
 
 
 
